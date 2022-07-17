@@ -329,6 +329,7 @@ io.on("connection", (socket)=>{
 
   //スタートボタンクリック
   socket.on('start', (e)=>{
+    display.log(game)
     let i = 1
     while(i <= 6){
         master.discard('', playersName);
