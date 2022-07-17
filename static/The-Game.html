@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./The-Game.css" rel="stylesheet">
+    <title>Scout</title>
+</head>
+<body>
+    <div class="container">
+        <div id="result"></div>
+        <button id="newgamebutton">もう一度遊ぶ</button>
+        <div id="field"></div>
+        <div id="nameinputarea">
+            <h1>The Game</h1>
+            <h2>名前を入力してください</h2>
+            <div class="player0">
+                <div class="playername">
+                    <input type="text" class="nameinput" data-namenumber="0">
+                    <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+            
+            <div class="player1">
+                <div class="playername">
+                <input type="text" class="nameinput" data-namenumber="1">
+                <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+            
+            <div class="player2">
+                <div class="playername">
+                <input type="text" class="nameinput" data-namenumber="2">
+                <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+            
+
+            <div class="player3">
+                <div class="playername">
+                <input type="text" class="nameinput" data-namenumber="3">
+                <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+            
+            <div class="player4">
+                <div class="playername">
+                <input type="text" class="nameinput" data-namenumber="4">
+                <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+
+            <div class="player5">
+                <div class="playername">
+                <input type="text" class="nameinput" data-namenumber="5">
+                <input type="button" value="決定" class="namebutton">
+                </div>
+            </div>
+        </div>
+        <div class="gamestart"><button id="gamestartbutton">開始</button></div>
+        <div id="players" display="none">
+            <div id="player0" class="player">
+                <div id="player0information" class="information"><p id="player0name" class="name"></p></div>
+                <div id="player0hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="0">終了</button>
+                    <button id="takeoverbutton0" class="takeoverbutton" data-playernumber="0">継承</button>
+                </div>
+            </div>
+            <div id="player1" class="player">
+                <div id="player1information" class="information"><p id="player1name" class="name"></p></div>
+                <div id="player1hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="1">終了</button>
+                    <button id="takeoverbutton1" class="takeoverbutton" data-playernumber="1">継承</button>
+                </div>
+            </div>
+            <div id="player2" class="player">
+                <div id="player2information" class="information"><p id="player2name" class="name"></p></div>
+                <div id="player2hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="2">終了</button>
+                    <button id="takeoverbutton2" class="takeoverbutton" data-playernumber="2">継承</button>
+                </div>
+            </div>
+            <div id="player3" class="player">
+                <div id="player3information" class="information"><p id="player3name" class="name"></p></div>
+                <div id="player3hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="3">終了</button>
+                    <button id="takeoverbutton3" class="takeoverbutton" data-playernumber="3">継承</button>
+                </div>
+            </div>
+            <div id="player4" class="player">
+                <div id="player4information" class="information"><p id="player4name" class="name"></p></div>
+                <div id="player4hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="4">終了</button>
+                    <button id="takeoverbutton4" class="takeoverbutton" data-playernumber="4">継承</button>
+                </div>
+            </div>
+            <div id="player5" class="player">
+                <div id="player5information" class="information"><p id="player5name" class="name"></p></div>
+                <div id="player5hand" class="hand"></div>
+                <div class="buttonarea">
+                    <button class="endbutton" data-playernumber="5">終了</button>
+                    <button id="takeoverbutton5" class="takeoverbutton" data-playernumber="5">継承</button>
+                </div>
+            </div>
+        </div>
+        <div id="initialize">
+            <button id="initializebutton">初期化</button>
+            <div id="yesorno">
+                <div>初期化しますか？</div>
+                <button id="yesbutton">はい</button>
+                <button id="nobutton">いいえ</button>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./jquery-3.4.1.min.js"></script>
+    <script src="./The-Game.js"></script>
+</body>
+</html>

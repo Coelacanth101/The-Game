@@ -1,0 +1,53 @@
+.container{
+    max-width: 800px;
+    height: 100%;
+    margin: auto;
+    text-align:center;
+}
+    #newgamebutton{
+        display: none;
+    }
+    #field{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    #players{
+        margin: auto;
+        display: none;
+    }
+        .player{
+            margin: 1.5em auto 0px auto;
+        }
+            .name{
+                text-align:center;
+                margin-left: 5px;
+            }
+            .information{
+                text-align:center;
+            }
+                p{
+                    display:inline;
+                }
+            .hand{
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+                .card{
+                    width: 50px;
+                    height: auto;
+                    padding: 0.5%;
+                }
+                    .reverse{
+                        transform: rotate(180deg)
+                    }
+            .buttonarea{
+                text-align:center;
+            }
+    #initialize{
+        margin: 100px auto auto auto
+    }
+        #yesorno{
+            display: none;
+        }
