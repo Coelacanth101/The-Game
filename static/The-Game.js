@@ -50,12 +50,12 @@ socket.on('nameDisplay', (playersName)=>{
 socket.on('hideItems', (nop)=>{
     display.hideItems(nop)
 });
-socket.on('name', (players)=>{
-    display.name(players)
+socket.on('name', (game)=>{
+    display.name(game)
 });
 
-socket.on('allHands', (players)=>{
-    display.allHands(players)
+socket.on('allHands', (game)=>{
+    display.allHands(game)
 });
 socket.on('myHand', (player)=>{
     display.myHand(player)
@@ -195,14 +195,14 @@ const display = {
         $('#field').show()
         $('#players').show();
     },
-    name(players){
-        for(let p of players){
+    name(game){
+        for(let p of game.players){
             $(`#player${p.number}`).data('socketid', `${p.socketID}`);
-            $(`#player${p.number}name`).html(`${p.name}          `);
+            $(`#player${p.number}name`).html(`${p.name}`);
         }
     },
-    allHands(players){
-        for(let p of players){
+    allHands(game){
+        for(let p of game.players){
             $(`#player${p.number}hand`).html('')
             if(p.socketID === socket.id){
                 for(c of p.hand){

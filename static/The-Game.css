@@ -8,6 +8,14 @@
         display: none;
     }
     #field{
+        display: none;
+    }
+    #direction{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    #box{
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
@@ -39,9 +47,6 @@
                     height: auto;
                     padding: 0.5%;
                 }
-                    .reverse{
-                        transform: rotate(180deg)
-                    }
             .buttonarea{
                 text-align:center;
             }

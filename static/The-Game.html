@@ -11,7 +11,6 @@
     <div class="container">
         <div id="result"></div>
         <button id="newgamebutton">もう一度遊ぶ</button>
-        <div id="field"></div>
         <div id="nameinputarea">
             <h1>The Game</h1>
             <h2>名前を入力してください</h2>
@@ -57,9 +56,23 @@
                 <input type="button" value="決定" class="namebutton">
                 </div>
             </div>
+            <div class="gamestart"><button id="gamestartbutton">開始</button></div>
         </div>
-        <div class="gamestart"><button id="gamestartbutton">開始</button></div>
-        <div id="players" display="none">
+        <div id="field">
+            <div id="direction">
+                <img src="./1→100.png" alt="1→100" class="card">
+                <img src="./1→100.png" alt="1→100" class="card">
+                <img src="./100→1.png" alt="1→100" class="card">
+                <img src="./100→1.png" alt="1→100" class="card">
+            </div>
+            <div id="box">
+                <img src="./1.png" alt="1" class="card" id="box1">
+                <img src="./1.png" alt="1" class="card" id="box2">
+                <img src="./100.png" alt="100" class="card" id="box3">
+                <img src="./100.png" alt="100" class="card" id="box4">
+            </div>
+        </div>
+        <div id="players">
             <div id="player0" class="player">
                 <div id="player0information" class="information"><p id="player0name" class="name"></p></div>
                 <div id="player0hand" class="hand"></div>

@@ -80,8 +80,14 @@ class Player{
   turnEnd(){
     this.draw()
     master.turnEnd()
-  }
+  };
   resetMyself(){
+    this.hand = [];
+    toDraw = 0;
+    this.playingCard = ''
+    this.targetBox = ''
+  };
+  refresh(){
     this.hand = [];
     toDraw = 0;
     this.playingCard = ''
@@ -89,12 +95,65 @@ class Player{
   };
 }
 
-const box1 = {pool:[1], current:1, direction:'up'}
-const box2 = {pool:[1], current:1, direction:'up'}
-const box3 = {pool:[100], current:100, direction:'down'}
-const box4 = {pool:[100], current:100, direction:'down'}
+const box1 = {pool:[1], current:1, direction:'up',
+  refresh(){
+    this.pool =[1];
+    this.current = 1;
+  },
+}
+const box2 = {pool:[1], current:1, direction:'up',
+  refresh(){
+    this.pool =[1];
+    this.current = 1;
+  },
+}
+const box3 = {pool:[100], current:100, direction:'down',
+  refresh(){
+    this.pool =[1];
+    this.current = 1;
+  },
+}
+const box4 = {pool:[100], current:100, direction:'down',
+  refresh(){
+    this.pool =[100];
+    this.current = 100;
+  },
+}
 
-const master = {turnPlayer:'', phase:'nameinputting',
+const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, box2, box3, box4],
+  playerMake(){
+    let i = 1
+    this.players = []
+    while(i <= nop){
+        let name = playersName[i-1].name
+        let number = i-1
+        let socketID = playersName[i-1].socketID
+        const player = new Player(name, number, socketID)
+        this.players.push(player)
+        i += 1
+    }
+  },
+  refresh(){
+    for(let p of this.players){
+        p.refresh();
+    }
+    for(let b of this.boxes){
+      b.refresh();
+    }
+    this.turnPlayer = ''
+    this.phase ='playing'
+  },
+  gameStart(){
+    this.playerMake();
+    this.deckMake();
+    this.refresh();
+    this.deal()
+    display.name();
+    display.allHands();
+    display.field()
+    display.hideItems();
+    display.turnPlayer();
+  },
   arrayHasID(array, ID){
     for(let item of array){
       if(item.socketID === ID){
@@ -160,7 +219,7 @@ const master = {turnPlayer:'', phase:'nameinputting',
   },
 }
 
-const game = {players:players, box1:box1, box2:box2, box3:box3, box4:box4}
+const game = {players:master.players, box1:box1, box2:box2, box3:box3, box4:box4}
 
 const display = {
   hideItems(){
@@ -172,56 +231,10 @@ const display = {
     io.to(socketID).emit('hidemyitems', nop)
   },
   name(){
-    let players = []
-    for(let p of master.players){
-      let player = {number:'',socketID:'',hand:[], name:'', gain:0, chip:0, doubleAction:1, score:0}
-      player.number = p.number;
-      player.socketID = p.socketID;
-      player.name = p.name
-      player.gain = p.gain;
-      player.chip = p.chip;
-      player.doubleAction = p.doubleAction;
-      player.score = p.score
-      for(c of p.hand){
-        let card = {name:'', index:'', position:''}
-        card.name = c.name;
-        card.index = c.index;
-        card.position = c.position;
-        player.hand.push(card)
-      }
-      players.push(player)
-    }
-    io.emit('name', players);
-  },
-  gain(player){
-    io.emit('gain', player);
-  },
-  chip(player){
-    io.emit('chip', player);
-  },
-  doubleaction(player){
-    io.emit('doubleaction', player);
-  },
-  score(player){
-    io.emit('score', player);
+    io.emit('name', game);
   },
   allHands(){
-    let players = []
-    for(let p of master.players){
-      let player = {number:'',socketID:'',hand:[], name:''}
-      player.number = p.number;
-      player.socketID = p.socketID;
-      player.name = p.name
-      for(c of p.hand){
-        let card = {name:'', index:'', position:''}
-        card.name = c.name;
-        card.index = c.index;
-        card.position = c.position;
-        player.hand.push(card)
-      }
-      players.push(player)
-    }
-    io.emit('allHands', players);
+    io.emit('allHands', gane);
   },
   myHand(player){
     io.emit('myHand', player)
@@ -241,25 +254,13 @@ const display = {
       let a = ''
       io.emit('nextButtonHide', a)
   },
-  roundResult(){
-      let data = {round:master.round, players:server.copyOfPlayers()}
-      io.emit('roundResult', data)
-  },
   matchResult(){
-      let data = {championname:master.champion.name, players:server.copyOfPlayers()}
+      let data = {championname:master.champion.name, players:master.copyOfPlayers()}
       io.emit('matchResult', data)
   },
   hideResult(){
     let a = ''
     io.emit('hideResult', a)
-  },
-  startButton(){
-    let a = ''
-    io.emit('startButton', a)
-  },
-  reverseButton(){
-    let a = ''
-    io.emit('reverseButton', a)
   },
   backgroundAllDelete(){
     let a = ''
@@ -305,87 +306,8 @@ const display = {
 }
 
 
-const server = {
-  arrayHasID(array, ID){
-    for(let item of array){
-      if(item.socketID === ID){
-        return true;
-      }
-    }
-    return false
-  },
-  discard(item,list){
-    if(list.includes(item)){
-        let i = list.indexOf(item);
-        list.splice(i, 1);
-    }
-  },
-  nameToCard(name){
-    for(c of allCards){
-        if(c.name === name){
-            return c;
-        };
-    };
-  },
-  copyOf(playerobj){
-    let player = {number:'',socketID:'',hand:[], name:'', gain:0, chip:0, doubleAction:1, score:0, lastScore:0}
-          player.number = playerobj.number;
-          player.socketID = playerobj.socketID;
-          player.name = playerobj.name
-          player.gain = playerobj.gain;
-          player.chip = playerobj.chip;
-          player.doubleAction = playerobj.doubleAction;
-          player.score = playerobj.score
-          player.lastScore = playerobj.lastScore
-          for(c of playerobj.hand){
-            let card = {name:'', index:'', position:''}
-            card.name = c.name;
-            card.index = c.index;
-            card.position = c.position;
-            player.hand.push(card)
-          }
-    return player
-  },
-  copyOfPlayers(){
-    let players = []
-    for(p of master.players){
-      players.push(this.copyOf(p))
-    }
-    return players
-  },
-  copyOfCard(cardobj){
-    let card = {name:'', index:'', position:''}
-    card.name = cardobj.name;
-    card.index = cardobj.index;
-    card.position = cardobj.position;
-    return card
-  },
-  recordLog(){
-    for(c of master.usingCards){
-      c.recordLog()
-    }
-    for(p of master.players){
-      p.recordLog()
-    }
-    master.recordLog()
-  },
-  undo(){
-    for(c of master.usingCards){
-      c.undo()
-    }
-    for(p of master.players){
-      p.undo()
-    }
-    master.undo()
-    display.field()
-    display.allHands()
-    display.name()
-    display.turnPlayer()
-  }
-}
-
-
 io.on("connection", (socket)=>{
+
   //画面の表示
   if(master.phase === 'nameinputting'){
     console.log(playersName)
@@ -399,7 +321,7 @@ io.on("connection", (socket)=>{
   
   //名前の入力
   socket.on("nameInput", (namedata)=>{
-    if(!server.arrayHasID(playersName, socket.id)){
+    if(!master.arrayHasID(playersName, socket.id)){
       playersName[namedata.number] = {name:namedata.name, socketID:namedata.socketID};
       io.emit("nameInput", namedata);     
     }
@@ -410,7 +332,7 @@ io.on("connection", (socket)=>{
     let i = 1
     let arr = playersName.slice(0, playersName.length)
     while(i <= 8){
-        server.discard('', playersName);
+        master.discard('', playersName);
         i += 1;
     };
     nop = playersName.length;
@@ -428,7 +350,7 @@ io.on("connection", (socket)=>{
 
   //手札を選択
   socket.on('handclick', (data)=>{
-    let thisCard = server.nameToCard(data.cardName)
+    let thisCard = master.nameToCard(data.cardName)
     if(thisCard.holder === master.turnPlayer && master.turn !== 0 && data.socketID === thisCard.holder.socketID){
       master.turnPlayer.choiceScoutPlace(thisCard)
       if(!thisCard.holder.combination.cards.includes(thisCard)){
@@ -462,59 +384,6 @@ io.on("connection", (socket)=>{
     let p = master.players[n]
     p.playCards();
   })
-
-  //カードをひっくり返す
-  socket.on('reversebuttonclick', (n)=>{
-    let p = master.players[n]
-    p.reverseHand();
-  })
-
-  //スカウトするカードを選択
-  socket.on('fieldcardclick', (data)=>{
-    if(data.socketID === master.turnPlayer.socketID){
-      let thisCard = server.nameToCard(data.cardName)
-      if(thisCard === master.fieldCards.cards[0] || thisCard === master.fieldCards.cards[master.fieldCards.cards.length -1]){
-        master.turnPlayer.choiceCandidate(thisCard)
-      }
-    }
-  })
-
-  //そのままスカウトする
-  socket.on('stayscoutbuttonclick', (player)=>{
-    let n = player.number
-    let p = master.players[n]
-    if(p === master.turnPlayer){
-        p.stayScout();
-    };
-  });
-
-  
-  //ひっくり返してスカウトする
-  socket.on('reversescoutbuttonclick', (player)=>{
-    let n = player.number
-    let p = master.players[n]
-    if(p === master.turnPlayer){
-        p.reverseScout();
-    };
-  });
-
-
-  //ダブルアクション
-  socket.on('doublebuttonclick', (player)=>{
-    let n = player.number
-    let p = master.players[n]
-    if(p === master.turnPlayer){
-        p.double();
-    };
-  })
-
-  //次のラウンド
-  socket.on('nextroundbuttonclick', (e)=>{
-    display.nextButtonHIde()
-    display.hideResult()
-    master.nextRound()
-  })
-
   
   //もう一度遊ぶ
   socket.on('newgamebuttonclick', (e)=>{
