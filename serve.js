@@ -330,21 +330,15 @@ io.on("connection", (socket)=>{
   //スタートボタンクリック
   socket.on('start', (e)=>{
     let i = 1
-    let arr = playersName.slice(0, playersName.length)
-    while(i <= 8){
+    while(i <= 6){
         master.discard('', playersName);
         i += 1;
     };
-    nop = playersName.length;
-    if(nop >= 3){
-      master.gameStart()
-      let i = 1
-      while(i <= 5){
-        playersName[i-1] = ''
-        i += 1
-      }
-    }else{
-      playersName = arr
+    master.gameStart()
+    i = 1
+    while(i <= 5){
+      playersName[i-1] = ''
+      i += 1
     }
   });
 
