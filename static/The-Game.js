@@ -167,7 +167,6 @@ $('#players').on('click', '.player .buttonarea .endbutton', function(){
 //画面表示
 const display = {
     hideItems(game){
-        console.log(game)
         let i = 1
         while(i <= game.maxPlayer){
             $(`#player${i-1}`).show()
@@ -226,11 +225,11 @@ const display = {
         $(`#player${player.number}hand`).html('')
         if(player.socketID === socket.id){
             for(c of player.hand){
-                $(`#player${player.number}hand`).append(`<img src="./${c.name}.png" id="player${player.number}card${c.index}" class="card ${c.position}" alt="${c.name}">`);
+                $(`#player${player.number}hand`).append(`<img src="./${c}.png" id="${c}" class="player${player.number}card card" alt="${c}">`);
             };
         }else{
             for(c of player.hand){
-                $(`#player${player.number}hand`).append(`<img src="./back.png" id="player${player.number}card${c.index}" class="card">`);
+                $(`#player${player.number}hand`).append(`<img src="./back.png" class="player${player.number}card card">`);
             }
         }
     },
@@ -359,7 +358,6 @@ const display = {
                     }else{
                         myNumber += 1
                     }
-                    console.log(myNumber)
                     $('#players').append(
                         `<div id="player${myNumber}" class="player">
                             <div id="player${myNumber}information" class="information"><p id="player${myNumber}name" class="name"></p></div>

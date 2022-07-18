@@ -60,18 +60,18 @@ class Player{
           this.targetBox.pool.push(this.playingCard)
           this.targetBox.current = this.playingCard
           this.toDraw += 1
-          display.allHands()
+          /*display.allHands()*/
+          display.myHand(this)
           display.field()
         }
       }else if(this.targetBox.direction === 'down'){
-        display.log(this.playingCard)
-        display.log(this.targetBox.current)
         if(this.playingCard < this.targetBox.current || this.playingCard === this.targetBox.current + 10){
           this.discard(this.playingCard)
           this.targetBox.pool.push(this.playingCard)
           this.targetBox.current = this.playingCard
           this.toDraw += 1
-          display.allHands()
+          /*display.allHands()*/
+          display.myHand(this)
           display.field()
         }
       }
@@ -164,7 +164,6 @@ const game = {maxPlayer:maxPlayer, players:[], turnPlayer:'', phase:'nameinputti
     }
     this.turnPlayer = this.players[0]
     this.deckMake();
-    display.log(this.deck)
     this.deal()
     display.playerSort();
     display.name();
