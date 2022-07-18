@@ -84,8 +84,8 @@ socket.on('boxRed', (boxNumber)=>{
 socket.on('boxClear', (card)=>{
     display.boxClear(card)
 });
-socket.on('yesbuttonclick', (maxPlayer)=>{
-    display.initialize(maxPlayer)
+socket.on('yesbuttonclick', ()=>{
+    display.initialize()
 });
 socket.on('turnplayer', (tn)=>{
     display.turnPlayer(tn)
@@ -105,13 +105,10 @@ socket.on('toggletakeoverbutton',()=>{
 socket.on('log', (a)=>{
     display.log(a)
 })
-socket.on('playersort', (players)=>{
-    display.playerSort(players)
-})
 
 
 //手札を選択
-$('#players').on('click', '.player .hand .card', function(){
+$('.hand').on('click', '.card',function(){
     if($(this).parent().parent().data('socketid') === socket.id){
         const cardNumber = Number($(this).attr('id'))
         let data = {cardNumber:cardNumber, socketID:socket.id}
@@ -119,6 +116,7 @@ $('#players').on('click', '.player .hand .card', function(){
     }
     
 })
+
 /*//カードを場に出す
 $('.playbutton').on('click',function(){
     if($(this).parent().parent().data('socketid') === socket.id){
@@ -144,14 +142,14 @@ $('#newgamebutton').on('click',function(){
 });
 
 //継承
-$('#players').on('click', '.player .buttonarea .takeoverbutton', function(){
+$('.takeoverbutton').on('click', function(){
     let n = Number($(this).data('playernumber'))
     let player ={number:n, socketID:socket.id}
     socket.emit('takeoverbuttonclick', player)
 });
 
 //ターン終了
-$('#players').on('click', '.player .buttonarea .endbutton', function(){
+$('.endbutton').on('click', function(){
     if($(this).parent().parent().data('socketid') === socket.id){
         let n = Number($(this).data('playernumber'))
         let player ={number:n, socketID:socket.id}
@@ -240,7 +238,6 @@ const display = {
             $(`#box${i}`).attr('src', `./${box.current}.png`)
             i += 1
         }
-        $('#remained').html(`山札残り${game.deck.length}枚`)
     },
     nextButtonHIde(){
         $('#nextroundbutton').hide()
@@ -274,7 +271,7 @@ const display = {
     boxclear(card){
         $(`#fieldcard${card.index}`).css('background-color', '');
     },
-    initialize(maxPlyer){
+    initialize(){
         $('#gamestartbutton').show()
         $('#nextroundbutton').hide();
         $('#newgamebutton').hide();
@@ -284,7 +281,7 @@ const display = {
         $('#yesorno').hide()
         $('#nameinputarea').html('<h1>名前を入力してください</h1>')
         let i = 1
-        while(i <= maxPlayer){
+        while(i <= 6){
             $('#nameinputarea').append(`<div class="player${i-1}">
                 <div class="playername">
                     <input type="text" class="nameinput" data-namenumber="${i-1}">
@@ -335,46 +332,7 @@ const display = {
     },
     log(a){
         console.log(a)
-    },
-    playerSort(players){
-        let myNumber
-        for(p of players){
-            if(p.socketID === socket.id){
-                $('#players').html('')
-                myNumber = p.number
-                $('#players').append(
-                    `<div id="player${myNumber}" class="player">
-                        <div id="player${myNumber}information" class="information"><p id="player${myNumber}name" class="name"></p></div>
-                        <div id="player${myNumber}hand" class="hand"></div>
-                        <div class="buttonarea">
-                            <button id="endbutton${myNumber}" class="endbutton" data-playernumber="${myNumber}">終了</button>
-                            <button id="takeoverbutton${myNumber}" class="takeoverbutton" data-playernumber="${myNumber}">継承</button>
-                        </div>
-                    </div>`
-                )
-                let i = 1
-                while(i <= players.length - 1){
-                    if(myNumber === players.length - 1){
-                        myNumber = 0
-                    }else{
-                        myNumber += 1
-                    }
-                    console.log(myNumber)
-                    $('#players').append(
-                        `<div id="player${myNumber}" class="player">
-                            <div id="player${myNumber}information" class="information"><p id="player${myNumber}name" class="name"></p></div>
-                            <div id="player${myNumber}hand" class="hand"></div>
-                            <div class="buttonarea">
-                                <button id="endbutton${myNumber}" class="endbutton" data-playernumber="${myNumber}">終了</button>
-                                <button id="takeoverbutton${myNumber}" class="takeoverbutton" data-playernumber="${myNumber}">継承</button>
-                            </div>
-                        </div>`
-                    )
-                    i += 1
-                }
-            }
-        }
-    },
+    }
 }
 
 

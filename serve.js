@@ -27,9 +27,13 @@ app.get("/:file", (req, res)=>{
 
 /*------------------------------------------
 ------------------------------------------*/
-let playersName = ['','','','','']
-let players = [];
-let deck = []
+const maxPlayer = 5
+let playersName = []
+let m = 1
+while(m <= maxPlayer){
+  playersName.push('')
+  m += 1
+}
 
 class Player{
   constructor(name, number, socketID){
@@ -37,7 +41,7 @@ class Player{
     this.number = number;
     this.socketID = socketID
     this.hand = [];
-    toDraw = 0;
+    this.toDraw = 0;
     this.playingCard = ''
     this.targetBox = ''
   };
@@ -49,19 +53,26 @@ class Player{
   };
   play(){
     if(this.targetBox && this.playingCard){
+      display.backgroundAllDelete()
       if(this.targetBox.direction === 'up'){
         if(this.playingCard > this.targetBox.current || this.playingCard === this.targetBox.current - 10){
           this.discard(this.playingCard)
           this.targetBox.pool.push(this.playingCard)
-          this.targetBox.current = card
+          this.targetBox.current = this.playingCard
           this.toDraw += 1
+          display.allHands()
+          display.field()
         }
       }else if(this.targetBox.direction === 'down'){
-        if(this.playingCard > this.targetBox.current || this.playingCard === this.targetBox.current + 10){
+        display.log(this.playingCard)
+        display.log(this.targetBox.current)
+        if(this.playingCard < this.targetBox.current || this.playingCard === this.targetBox.current + 10){
           this.discard(this.playingCard)
           this.targetBox.pool.push(this.playingCard)
-          this.targetBox.current = card
+          this.targetBox.current = this.playingCard
           this.toDraw += 1
+          display.allHands()
+          display.field()
         }
       }
       this.playingCard = ''
@@ -70,16 +81,16 @@ class Player{
   };
   draw(){
     while(this.toDraw > 0){
-      let randomNumber = Math.floor(Math.random()*deck.length);
-      let card = deck[randomNumber]
+      let randomNumber = Math.floor(Math.random()*game.deck.length);
+      let card = game.deck[randomNumber]
       this.hand.push(card);
-      deck.splice(randomNumber,1);
+      game.deck.splice(randomNumber,1);
       this.toDraw -= 1
     }
   };
   turnEnd(){
     this.draw()
-    master.turnEnd()
+    game.turnEnd()
   };
   resetMyself(){
     this.hand = [];
@@ -89,7 +100,7 @@ class Player{
   };
   refresh(){
     this.hand = [];
-    toDraw = 0;
+    this.toDraw = 0;
     this.playingCard = ''
     this.targetBox = ''
   };
@@ -109,8 +120,8 @@ const box2 = {pool:[1], current:1, direction:'up',
 }
 const box3 = {pool:[100], current:100, direction:'down',
   refresh(){
-    this.pool =[1];
-    this.current = 1;
+    this.pool =[100];
+    this.current = 100;
   },
 }
 const box4 = {pool:[100], current:100, direction:'down',
@@ -120,11 +131,11 @@ const box4 = {pool:[100], current:100, direction:'down',
   },
 }
 
-const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, box2, box3, box4],
+const game = {maxPlayer:maxPlayer, players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, box2, box3, box4], deck:[],
   playerMake(){
     let i = 1
     this.players = []
-    while(i <= nop){
+    while(i <= playersName.length){
         let name = playersName[i-1].name
         let number = i-1
         let socketID = playersName[i-1].socketID
@@ -141,13 +152,21 @@ const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, b
       b.refresh();
     }
     this.turnPlayer = ''
-    this.phase ='playing'
+    this.phase = 'playing'
   },
   gameStart(){
+    this.phase = 'playing'
     this.playerMake();
+    let i = 1
+    while(i <= maxPlayer){
+      playersName[i-1] = ''
+      i += 1
+    }
+    this.turnPlayer = this.players[0]
     this.deckMake();
-    this.refresh();
+    display.log(this.deck)
     this.deal()
+    display.playerSort();
     display.name();
     display.allHands();
     display.field()
@@ -163,16 +182,16 @@ const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, b
     return false
   },
   deckMake(){
-    deck = []
+    this.deck = []
     let i = 2
     while(i <= 99){
-      deck.push(i)
+      this.deck.push(i)
       i += 1
     }
   },
   deal(){
     let n;
-    switch(players.length){
+    switch(this.players.length){
         case 1:
             n = 8;
             break;
@@ -189,13 +208,13 @@ const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, b
             n = 6;
             break;
     }
-    for(let p of players){
+    for(let p of this.players){
         let i = 1;
         while(i <= n){
-            let randomNumber = Math.floor(Math.random()*deck.length);
-            let card = deck[randomNumber]
+            let randomNumber = Math.floor(Math.random()*this.deck.length);
+            let card = this.deck[randomNumber]
             p.hand.push(card);
-            deck.splice(randomNumber,1);
+            this.deck.splice(randomNumber,1);
             i += 1;
         }
     }
@@ -208,6 +227,8 @@ const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, b
     }
     this.turn += 1
     display.turnPlayer()
+    display.allHands()
+    display.field()
   },
   arrayHasID(array, ID){
     for(let item of array){
@@ -217,45 +238,42 @@ const master = {players:[], turnPlayer:'', phase:'nameinputting', boxes:[box1, b
     }
     return false
   },
+  takeOver(player){
+    this.players[player.number].socketID = player.socketID
+  },
+  initialize(){
+    this.players.length = 0;
+    this.refresh()
+    this.phase = 'nameinputting'
+  },
 }
-
-const game = {players:master.players, box1:box1, box2:box2, box3:box3, box4:box4}
 
 const display = {
   hideItems(){
-    let nop = master.players.length
-    io.emit('hideItems', nop);
+    io.emit('hideItems', game);
   },
   hideMyItems(socketID){
-    let nop = master.players.length
+    let nop = game.players.length
     io.to(socketID).emit('hidemyitems', nop)
   },
   name(){
     io.emit('name', game);
   },
   allHands(){
-    io.emit('allHands', gane);
+    io.emit('allHands', game);
   },
   myHand(player){
     io.emit('myHand', player)
   },
   field(){
-      let cards = []
-      for(c of master.fieldCards.cards){
-        let card = {name:'', index:'', position:''}
-        card.name = c.name;
-        card.index = c.index;
-        card.position = c.position
-        cards.push(card)
-      }
-      io.emit('field', cards)
+      io.emit('field', game)
   },
   nextButtonHIde(){
       let a = ''
       io.emit('nextButtonHide', a)
   },
   matchResult(){
-      let data = {championname:master.champion.name, players:master.copyOfPlayers()}
+      let data = {championname:game.champion.name, players:game.copyOfPlayers()}
       io.emit('matchResult', data)
   },
   hideResult(){
@@ -269,21 +287,25 @@ const display = {
   backgroundDelete(card){
     io.emit('backgroundDelete', card)
   },
-  backgroundRed(card){
-    io.emit('backgroundRed', card)    
+  handRed(player){
+    io.emit('handRed', player)
   },
-  fieldCardRed(card){
-    io.emit('fieldcardred', card)
+  handClear(){
+    let player = game.turnPlayer
+    io.emit('handClear', player)
   },
-  fieldCardDelete(card){
-    io.emit('fieldcarddelete', card);
+  boxRed(boxNumber){
+    io.emit('boxRed', boxNumber)
+  },
+  boxDelete(card){
+    io.emit('boxDelete', card);
   },
   initialize(){
-    let a = ''
-    io.emit('yesbuttonclick',a)
+    let maxPlayer = game.maxPlayer
+    io.emit('yesbuttonclick',maxPlayer)
   },
   turnPlayer(){
-    let tn = master.turnPlayer.number
+    let tn = game.turnPlayer.number
     io.emit('turnplayer', tn)
   },
   turnPlayerDelete(){
@@ -300,28 +322,37 @@ const display = {
   showStart(n){
     io.emit('showstart', n)
   },
+  playerSort(){
+    let players = game.players
+    io.emit('playersort', players)
+  },
   log(a){
     io.emit('log', a)
   },
 }
-
+function discard(item,list){
+  if(list.includes(item)){
+      let i = list.indexOf(item);
+      list.splice(i, 1);
+  }
+}
 
 io.on("connection", (socket)=>{
 
   //画面の表示
-  if(master.phase === 'nameinputting'){
-    console.log(playersName)
+  if(game.phase === 'nameinputting'){
     io.to(socket.id).emit("nameDisplay", (playersName));
   }else{
     display.name();
     display.allHands();
     display.hideItems();
     display.field()
+    display.turnPlayer();
   }
   
   //名前の入力
   socket.on("nameInput", (namedata)=>{
-    if(!master.arrayHasID(playersName, socket.id)){
+    if(!game.arrayHasID(playersName, socket.id)){
       playersName[namedata.number] = {name:namedata.name, socketID:namedata.socketID};
       io.emit("nameInput", namedata);     
     }
@@ -329,46 +360,41 @@ io.on("connection", (socket)=>{
 
   //スタートボタンクリック
   socket.on('start', (e)=>{
-    display.log(game)
     let i = 1
-    while(i <= 6){
-        master.discard('', playersName);
+    while(i <= maxPlayer){
+        discard('', playersName);
         i += 1;
     };
-    master.gameStart()
-    i = 1
-    while(i <= 5){
-      playersName[i-1] = ''
-      i += 1
-    }
+    if(playersName.length >= 1){
+      game.gameStart()
+    };
   });
 
   //手札を選択
   socket.on('handclick', (data)=>{
-    let thisCard = master.nameToCard(data.cardName)
-    if(thisCard.holder === master.turnPlayer && master.turn !== 0 && data.socketID === thisCard.holder.socketID){
-      master.turnPlayer.choiceScoutPlace(thisCard)
-      if(!thisCard.holder.combination.cards.includes(thisCard)){
-          let card = {holderNumber:'', index:''}
-          card.holderNumber = thisCard.holder.number
-          card.index = thisCard.index
-          display.backgroundRed(card)
-          thisCard.holder.choice(thisCard);
-      }else{
-          let card = {holderNumber:'', index:''}
-          card.holderNumber = thisCard.holder.number
-          card.index = thisCard.index
-          display.backgroundDelete(card)
-          thisCard.holder.cancel(thisCard);
-      }
-      master.turnPlayer.checkCombination();
+    if(data.socketID === game.turnPlayer.socketID){
+      game.turnPlayer.playingCard = data.cardNumber
+      let player = game.turnPlayer
+      display.handRed(player)
+      player.play()
     }
   });
+
+  //箱を選択
+  socket.on('boxclick', (data)=>{
+    if(data.socketID === game.turnPlayer.socketID){
+      let boxNumber = data.boxNumber
+      game.turnPlayer.targetBox = game.boxes[boxNumber - 1]
+      display.boxRed(boxNumber)
+      game.turnPlayer.play()
+    }
+  })
+
 
   //開始に同意する
   socket.on('startbuttonclick', (data)=>{
     let n = data.number
-    let p = master.players[n]
+    let p = game.players[n]
     p.startOK();
     io.emit('startbuttonclick', n)
   })
@@ -376,35 +402,49 @@ io.on("connection", (socket)=>{
   //カードを場に出す
   socket.on('playbuttonclick', (player)=>{
     let n = player.number
-    let p = master.players[n]
+    let p = game.players[n]
     p.playCards();
   })
   
   //もう一度遊ぶ
   socket.on('newgamebuttonclick', (e)=>{
-    master.newGame();
+    game.newGame();
   })
 
   //初期化
   
   socket.on('yesbuttonclick', (e)=>{
     display.initialize()
-    master.initialize()
+    game.initialize()
   })
 
   //継承
   socket.on('takeoverbuttonclick', (player)=>{
-    master.takeOver(player)
+    game.takeOver(player)
     display.takeOver(player)
-    display.allHands()
+    display.playerSort()
+    display.name();
+    display.allHands();
+    display.hideItems();
+    display.field()
+    display.turnPlayer();
   })
 
   //ターン終了
   socket.on('endbuttonclick', (player)=>{
     let n = player.number
-    let p = master.players[n]
-    if(p === master.turnPlayer){
+    let p = game.players[n]
+    if(p === game.turnPlayer && p.toDraw >= 2){
         p.turnEnd();
     };
+  })
+
+
+
+
+
+  //コンソールに表示
+  socket.on('console',(e)=>{
+    socket.emit('console', game)
   })
 })
