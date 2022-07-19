@@ -273,7 +273,7 @@ const display = {
     boxclear(card){
         $(`#fieldcard${card.index}`).css('background-color', '');
     },
-    initialize(maxPlyer){
+    initialize(maxPlayer){
         $('#gamestartbutton').show()
         $('#nextroundbutton').hide();
         $('#newgamebutton').hide();
