@@ -93,6 +93,9 @@ class Player{
     }
   };
   turnEnd(){
+    this.playingCard = ''
+    this.targetBox = ''
+    display.boxDelete()
     this.draw()
     game.turnEnd()
   };
