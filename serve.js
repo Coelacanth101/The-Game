@@ -81,11 +81,15 @@ class Player{
   };
   draw(){
     while(this.toDraw > 0){
-      let randomNumber = Math.floor(Math.random()*game.deck.length);
-      let card = game.deck[randomNumber]
-      this.hand.push(card);
-      game.deck.splice(randomNumber,1);
-      this.toDraw -= 1
+      if(game.deck.length > 0){
+        let randomNumber = Math.floor(Math.random()*game.deck.length);
+        let card = game.deck[randomNumber]
+        this.hand.push(card);
+        game.deck.splice(randomNumber,1);
+        this.toDraw -= 1
+      }else{
+        break
+      }
     }
   };
   turnEnd(){
