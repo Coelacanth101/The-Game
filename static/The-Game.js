@@ -281,7 +281,7 @@ const display = {
         $('#field').hide();
         $('#players').hide();
         $('#yesorno').hide()
-        $('#nameinputarea').html('<h1>名前を入力してください</h1>')
+        $('#nameinputarea').html('<h1>The Game</h1><h2>名前を入力してください</h2>')
         let i = 1
         while(i <= maxPlayer){
             $('#nameinputarea').append(`<div class="player${i-1}">
