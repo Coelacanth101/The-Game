@@ -303,8 +303,9 @@ const display = {
   boxRed(boxNumber){
     io.emit('boxRed', boxNumber)
   },
-  boxDelete(card){
-    io.emit('boxDelete', card);
+  boxDelete(){
+    let e = ''
+    io.emit('boxDelete', e);
   },
   initialize(){
     let maxPlayer = game.maxPlayer

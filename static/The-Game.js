@@ -84,6 +84,9 @@ socket.on('boxRed', (boxNumber)=>{
 socket.on('boxClear', (card)=>{
     display.boxClear(card)
 });
+socket.on('boxDelete',(e)=>{
+    display.boxDelete()
+})
 socket.on('yesbuttonclick', (maxPlayer)=>{
     display.initialize(maxPlayer)
 });
