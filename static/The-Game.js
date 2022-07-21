@@ -366,7 +366,6 @@ const display = {
                             <div id="player${myNumber}information" class="information"><p id="player${myNumber}name" class="name"></p></div>
                             <div id="player${myNumber}hand" class="hand"></div>
                             <div class="buttonarea">
-                                <button id="endbutton${myNumber}" class="endbutton" data-playernumber="${myNumber}">終了</button>
                                 <button id="takeoverbutton${myNumber}" class="takeoverbutton" data-playernumber="${myNumber}">継承</button>
                             </div>
                         </div>`

@@ -8,7 +8,6 @@ const http = require("http").createServer(app);
 const io   = require("socket.io")(http);
 const DOCUMENT_ROOT = __dirname + "/static";
 const SECRET_TOKEN = "abcdefghijklmn12345";
-
 app.get("/", (req, res)=>{
   res.sendFile(DOCUMENT_ROOT + "/The-Game.html");
 });
@@ -97,6 +96,7 @@ class Player{
     this.targetBox = ''
     display.boxDelete()
     this.draw()
+    this.toDraw = 0
     game.turnEnd()
   };
   resetMyself(){
@@ -226,10 +226,18 @@ const game = {maxPlayer:maxPlayer, players:[], turnPlayer:'', phase:'nameinputti
     }
   },
   turnEnd(){
-    if(this.players.indexOf(this.turnPlayer) === this.players.length-1){
+    while(true){
+      let now = this.turnPlayer
+      if(this.players.indexOf(this.turnPlayer) === this.players.length-1){
         this.turnPlayer = this.players[0];
-    } else {
-        this.turnPlayer = this.players[this.players.indexOf(this.turnPlayer)+1];
+      } else {
+          this.turnPlayer = this.players[this.players.indexOf(this.turnPlayer)+1];
+      }
+      if(this.turnPlayer.hand.length !== 0){
+        break
+      }else if(this.turnPlayer === now && now.hand.length === 0){
+        return
+      }
     }
     this.turn += 1
     display.turnPlayer()
@@ -441,9 +449,17 @@ io.on("connection", (socket)=>{
   socket.on('endbuttonclick', (player)=>{
     let n = player.number
     let p = game.players[n]
-    if(p === game.turnPlayer && p.toDraw >= 2){
-        p.turnEnd();
-    };
+    if(p === game.turnPlayer){
+      if(game.deck.length !== 0){
+        if(p.toDraw >= 2 || p.hand.length === 0){
+          p.turnEnd()
+        }
+      }else{
+        if(p.toDraw >= 1 || p.hand.length === 0){
+          p.turnEnd()
+        }
+      }
+    }
   })
 
 
